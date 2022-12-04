@@ -8,16 +8,37 @@ use std::path::Path;
 #[derive(Debug, Clone)]
 struct HandError;
 
-enum Hand {
-    Rock,
-    Paper,
-    Scissors,
-}
+#[derive(Debug, Clone)]
+struct OutcomeError;
 
 enum Outcome {
     Win,
     Draw,
     Loss,
+}
+
+impl Outcome {
+    fn new(c: char) -> Result<Outcome, OutcomeError> {
+        match c {
+            'X' => Ok(Outcome::Loss),
+            'Y' => Ok(Outcome::Draw),
+            'Z' => Ok(Outcome::Win),
+            _ => Err(OutcomeError)
+        }
+    }
+}
+
+impl fmt::Display for OutcomeError{
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "Invalid outcome input.")
+    }
+}
+
+//
+enum Hand {
+    Rock,
+    Paper,
+    Scissors,
 }
 
 impl fmt::Display for HandError {
@@ -61,20 +82,46 @@ impl Hand {
             }
         }
     }
+
+    fn check_opp_against_wanted_outcome(&self, wanted_outcome: Outcome) -> Hand {
+        match wanted_outcome {
+            Outcome::Win => {
+                match self {
+                    Hand::Rock => { Hand::Paper }
+                    Hand::Paper => { Hand::Scissors }
+                    Hand::Scissors => { Hand::Rock }
+                }
+            }
+            Outcome::Draw => {
+                match self {
+                    Hand::Rock => { Hand::Rock }
+                    Hand::Paper => { Hand::Paper }
+                    Hand::Scissors => {Hand::Scissors }
+                }
+            }
+            Outcome::Loss => {
+                match self {
+                    Hand::Rock => { Hand::Scissors }
+                    Hand::Paper => { Hand::Rock }
+                    Hand::Scissors => { Hand::Paper }
+                }
+            }
+        }
+    }
 }
 
-fn calculate_score(opponent: char, me: char) -> i32 {
+fn calculate_score(opponent: char, outcome: char) -> i32 {
     let mut score = 0;
-    let my_hand = Hand::new(me).expect("Not a valid hand");
+    let wanted_outcome = Outcome::new(outcome).expect("Not a valid hand");
     let opp_hand = Hand::new(opponent).expect("Not a valid hand");
 
-    match my_hand.check_against_other(opp_hand) {
+    match wanted_outcome {
         Outcome::Win => { score += 6; }
         Outcome::Draw => { score += 3; }
         Outcome::Loss => { score += 0; }
     }
 
-    match my_hand {
+    match opp_hand.check_opp_against_wanted_outcome(wanted_outcome) {
         Hand::Rock => { score += 1; }
         Hand::Paper => { score += 2; }
         Hand::Scissors => { score += 3; }
