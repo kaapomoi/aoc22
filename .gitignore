@@ -33,6 +33,9 @@ Cargo.lock
 *.idea/**/dynamic.xml
 *.idea/**/uiDesigner.xml
 *.idea/**/dbnavigator.xml
+ 
+**.idea/**
+**target/**
 
 # Gradle
 *.idea/**/gradle.xml
