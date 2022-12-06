@@ -27,12 +27,13 @@ int main()
         lines.push_back(l);
     }
 
+    int n = 14;
     for (std::string const& line : lines) {
         for (int i = 0; i < line.size(); ++i) {
-            bool success{check_next(line, i, 4)};
+            bool success{check_next(line, i, n)};
 
             if (success){
-                index = i + 4;
+                index = i + n;
                 break;
             }
         }
