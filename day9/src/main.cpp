@@ -39,27 +39,32 @@ int main()
 
     std::set<Pos> tail_visited_squares;
 
-    Pos head{0, 0};
-    Pos tail{0, 0};
-    tail_visited_squares.insert(tail);
+    std::vector<Pos> rope(10, Pos{});
 
-    auto move_tail = [&tail, &head, &tail_visited_squares](const Pos& head_move) {
-        head.x += head_move.x;
-        head.y += head_move.y;
+    auto move_tail = [&rope, &tail_visited_squares](const Pos& head_move) {
+        rope[0] = rope[0] + head_move;
 
-        auto dx = tail.x - head.x;
-        if (abs(dx) > 1) {
-            tail.x += head_move.x;
-            tail.y = head.y;
+        auto sign = [](auto const& d) { return d > 0 ? 1 : -1; };
+
+        for (int i = 1; i < rope.size(); ++i) {
+            auto dx = rope[i].x - rope[i - 1].x;
+            auto dy = rope[i].y - rope[i - 1].y;
+
+            if (dx == 0 || dy == 0) {
+                if (abs(dx) >= 2) {
+                    rope[i].x -= sign(dx);
+                }
+                if (abs(dy) >= 2) {
+                    rope[i].y -= sign(dy);
+                }
+            }
+            else if ((abs(dx) != 1) || (abs(dy) != 1)) {
+                rope[i].x -= sign(dx);
+                rope[i].y -= sign(dy);
+            }
         }
 
-        auto dy = tail.y - head.y;
-        if (abs(dy) > 1) {
-            tail.x = head.x;
-            tail.y += head_move.y;
-        }
-
-        tail_visited_squares.insert(Pos{tail.x, tail.y});
+        tail_visited_squares.insert(Pos{rope.back().x, rope.back().y});
     };
 
     for (auto const& line : lines) {
