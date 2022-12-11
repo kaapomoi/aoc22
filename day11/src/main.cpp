@@ -3,6 +3,7 @@
 #include <iostream>
 #include <list>
 #include <memory>
+#include <numeric>
 
 static constexpr std::uint64_t worry_divider{3};
 
@@ -96,7 +97,12 @@ int main()
         lines.erase(lines.begin());
     }
 
-    std::uint64_t const num_rounds{20};
+    std::uint64_t lcm{1};
+    for (auto const& monkey : monkeys) {
+        lcm = std::lcm(lcm, monkey.m_rule);
+    }
+
+    std::uint64_t const num_rounds{10000};
 
     for (int i = 0; i < num_rounds; ++i) {
         for (auto& monkey : monkeys) {
@@ -116,8 +122,8 @@ int main()
                     item *= item;
                     break;
                 }
-                /// Phew, the item survived
-                item /= worry_divider;
+                /// Phew, the item survived. Pt.2: No effect
+                item %= lcm;
 
                 if ((item % monkey.m_rule) == 0) {
                     monkeys[monkey.m_monkey_true].m_items.push_back(item);
